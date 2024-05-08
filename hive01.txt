@@ -31,7 +31,7 @@ overwrite  into table flight;
 
 select * from flight;
 
-create table flight (fno int, year int, source varchar(10))
+create table nflight (fno int, year int, source varchar(10))
 row format delimited
 fields terminated by ','
 lines terminated by '\n'

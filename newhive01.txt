@@ -1,0 +1,37 @@
+# Start HBase shell
+hbase shell
+
+# Create HBase table for flight information
+create 'flight_info', {NAME => 'info'}, {NAME => 'schedule'}, {NAME => 'delay'}
+
+# Create another table in HBase
+create 'another_table', {NAME => 'column_family'}
+
+# Drop a table in HBase
+disable 'another_table'
+drop 'another_table'
+
+# Alter a table in HBase (adding a new column family)
+alter 'flight_info', {NAME => 'new_column_family'}
+
+-- Create an external Hive table to connect to HBase
+CREATE EXTERNAL TABLE flight_info_hive (
+    rowkey STRING,
+    info_col1 STRING,
+    info_col2 INT,
+    schedule_col1 STRING,
+    schedule_col2 STRING,
+    delay_col1 FLOAT
+)
+STORED BY 'org.apache.hadoop.hive.hbase.HBaseStorageHandler'
+WITH SERDEPROPERTIES ("hbase.columns.mapping" = ":key,info:col1,info:col2,schedule:col1,schedule:col2,delay:col1")
+TBLPROPERTIES("hbase.table.name" = "flight_info");
+
+-- Find total departure delay
+SELECT SUM(delay_col1) AS total_departure_delay FROM flight_info_hive;
+
+-- Find average departure delay
+SELECT AVG(delay_col1) AS average_departure_delay FROM flight_info_hive;
+
+-- Create index on Flight Information Table
+CREATE INDEX flight_info_index ON TABLE flight_info_hive (rowkey) AS 'org.apache.hadoop.hive.hbase.index.ColumnIndexHandler';

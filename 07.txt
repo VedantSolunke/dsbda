@@ -48,12 +48,20 @@ SELECT * FROM Customer_info
 JOIN order_info ON Customer_info.OrderID = order_info.OrderID
 JOIN item_info ON order_info.ItemID = item_info.Item_ID;
 
+
+SELECT ci.*, oi.*, ii.*
+FROM Customer_info ci
+JOIN order_info oi ON ci.OrderID = oi.OrderID
+JOIN item_info ii ON oi.ItemID = ii.Item_ID;
+
+
 d. Create an index on Customer Information System in Hive:
 
 $ hive
 CREATE INDEX idx_customer_info ON TABLE Customer_info (Cust_ID) AS 'COMPACT' WITH DEFERRED REBUILD;
 ALTER INDEX idx_customer_info ON Customer_info REBUILD;
 
+SHOW INDEX ON Customer_info;
 
 e. Find the total and average sales in Hive:
 
@@ -61,11 +69,26 @@ $ hive
 hive> SELECT SUM(ItemPrice * Quantity) AS total_sales, AVG(ItemPrice * Quantity) AS avg_sales
       FROM order_info JOIN item_info ON order_info.ItemID = item_info.Item_ID;
 
+
+SELECT SUM(ii.ItemPrice * oi.Quantity) AS total_sales, AVG(ii.ItemPrice * oi.Quantity) AS avg_sales
+FROM order_info oi 
+JOIN item_info ii ON oi.ItemID = ii.Item_ID;
+
+
 f. Find Order details with maximum cost:
 
 $ hive
 hive> SELECT * FROM order_info
       WHERE (ItemPrice * Quantity) = (SELECT MAX(ItemPrice * Quantity) FROM order_info);
+
+
+
+SELECT oi.*
+FROM order_info oi
+JOIN (
+    SELECT MAX(ItemPrice * Quantity) AS max_cost FROM order_info
+) max_cost_table
+ON (oi.ItemPrice * oi.Quantity) = max_cost_table.max_cost;
 
 
 g. Creating an external Hive table to connect to HBase for Customer Information System:
@@ -86,7 +109,9 @@ WITH SERDEPROPERTIES (
       )
 TBLPROPERTIES ("hbase.table.name" = "table07");
 
+
 INSERT INTO CustomerInfoHBase SELECT * FROM Customer_info;
+
 
 SELECT * FROM CustomerInfoHBase;
 

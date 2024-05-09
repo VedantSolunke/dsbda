@@ -23,6 +23,10 @@ put 'flight',4,'revenue:rs','45000'
 put 'flight',1,'revenue:rs','45000'
 put 'flight',2,'revenue:rs','25000'
 
+create 'flight0101','finfo','fsch'
+
+disable 'flight0101' # Disable the table before dropping
+drop 'flight0101'    # Drop the table
 
 
 # Hive Commands

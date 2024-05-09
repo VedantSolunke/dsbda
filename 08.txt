@@ -16,7 +16,9 @@ FIELDS TERMINATED BY ','
 LINES TERMINATED BY '\n'
 STORED AS TEXTFILE;
 
-LOAD DATA LOCAL INPATH 'sample.txt' INTO TABLE OnlineRetail;
+LOAD DATA LOCAL INPATH 'sample.txt' OVERWRITE INTO TABLE OnlineRetail;
+
+SELECT * FROM OnlineRetail;
 
 2. Create Index on Online Retail Table in Hive
 
@@ -94,11 +96,14 @@ TBLPROPERTIES (
     "hbase.table.name" = "table08"
 );
 
+INSERT INTO OnlineRetailHBase SELECT * FROM OnlineRetail;
+
+SELECT * FROM OnlineRetailHBase;
+
 
 p. Display records of OnlineRetail Table in Hbase.
 
 scan 'table08'
-
 
 
 
